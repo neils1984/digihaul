@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 
-class FeatureProcessor:
+class DatasetProcessor:
     DISTANCE_URL = DISTANCEMATRIX_URL
 
     @staticmethod
