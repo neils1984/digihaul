@@ -1,10 +1,13 @@
-from config import DATA_PATH, DISTANCEMATRIX_URL, DISTANCEMATRIX_API_KEY
+from config import DISTANCEMATRIX_URL, DISTANCEMATRIX_API_KEY
 import pandas as pd
 import requests
 
 
 class DatasetProcessor:
-    DISTANCE_URL = DISTANCEMATRIX_URL
+    """Contains the methods for processing the raw data into a feature store that can be used for model
+    training"""
+
+    DISTANCE_API_URL = DISTANCEMATRIX_URL
 
     @staticmethod
     def merge_data(shipment_bookings, gps_data):
@@ -24,7 +27,7 @@ class DatasetProcessor:
         return shipment_bookings
 
     def get_route_info(self, booking):
-        """This method WOULD return the distance/estimated travel time data
+        """This method *would* return the distance/estimated travel time data
         from a routing API such as distancematrix.ai or Google Maps if one was available
 
         Args:
@@ -38,16 +41,28 @@ class DatasetProcessor:
         delivery_lat = booking["LAST_DELIVERY_LATITUDE"]
         delivery_lon = booking["LAST_DELIVERY_LATITUDE"]
         return requests.get(
-            f"{self.DISTANCE_URL}?lat1={collection_lat}&lon1={collection_lon}&lat2={delivery_lat}&lon2={delivery_lon}&key={DISTANCEMATRIX_API_KEY}"
+            f"{self.DISTANCE_API_URL}?lat1={collection_lat}&lon1={collection_lon}&"
+            f"lat2={delivery_lat}&lon2={delivery_lon}&key={DISTANCEMATRIX_API_KEY}"
         )
 
     def transform(self, df):
+        """Carries out transformations that cannot easily be carried out in the training pipeline.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to be transformed
+        """
         pass
 
     def clean(self, df):
+        """Performs cleaning operations on the DataFrame df.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to be cleaned.
+        """
         pass
 
     def process(self, df_shipping, df_gps):
         df = self.merge_data(df_shipping, df_gps)
         df = self.transform(df)
         df = self.clean(df)
+        return df

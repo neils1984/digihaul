@@ -1,10 +1,10 @@
 from config import DATA_PATH
-from components import FeatureProcessor
+from components import DatasetProcessor
 import pandas as pd
 
 
 def read_data():
-    """Reads the CSV file"""
+    """Reads the bookings and GPS data CSV files."""
     shipping_date_cols = [
         "FIRST_COLLECTION_SCHEDULE_EARLIEST",
         "FIRST_COLLECTION_SCHEDULE_LATEST",
@@ -21,8 +21,8 @@ def read_data():
 
 
 def process_data(shipment_bookings, gps):
-    fp = FeatureProcessor()
-    df = fp.process(shipment_bookings, gps)
+    dp = DatasetProcessor()
+    df = dp.process(shipment_bookings, gps)
     return df
 
 
