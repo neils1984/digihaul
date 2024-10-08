@@ -9,6 +9,7 @@ scikit-learn = "*"
 ipykernel = "*"
 matplotlib = "*"
 seaborn = "*"
+requests = "*"
 python-dotenv = "*"
 
 [dev-packages]
