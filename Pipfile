@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+scikit-learn = "*"
+ipykernel = "*"
+matplotlib = "*"
+seaborn = "*"
+requests = "*"
+python-dotenv = "*"
+geopy = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3"
