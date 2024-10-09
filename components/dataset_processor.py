@@ -1,4 +1,6 @@
 from config import DISTANCEMATRIX_URL, DISTANCEMATRIX_API_KEY
+from geopy.distance import geodesic
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 import requests
 
@@ -36,14 +38,18 @@ class DatasetProcessor:
         Returns:
             dict: a dictionary of distance/time values.
         """
-        collection_lat = booking["FIRST_COLLECTION_LATITUDE"]
-        collection_lon = booking["FIRST_COLLECTION_LONGITUDE"]
-        delivery_lat = booking["LAST_DELIVERY_LATITUDE"]
-        delivery_lon = booking["LAST_DELIVERY_LATITUDE"]
-        return requests.get(
-            f"{self.DISTANCE_API_URL}?lat1={collection_lat}&lon1={collection_lon}&"
-            f"lat2={delivery_lat}&lon2={delivery_lon}&key={DISTANCEMATRIX_API_KEY}"
-        )
+        params = {
+            "lat1": booking["FIRST_COLLECTION_LATITUDE"],
+            "lon1": booking["FIRST_COLLECTION_LONGITUDE"],
+            "lat2": booking["LAST_DELIVERY_LATITUDE"],
+            "lon2": booking["LAST_DELIVERY_LONGITUDE"],
+            "key": DISTANCEMATRIX_API_KEY,
+        }
+        response = requests.get(f"{self.DISTANCE_API_URL}", params=params)
+        return {
+            "distance": response.json()["info"]["distance"],
+            "duration": response.json()["info"]["duration"],
+        }
 
     def transform(self, df):
         """Carries out transformations that cannot easily be carried out in the training pipeline.
@@ -51,7 +57,24 @@ class DatasetProcessor:
         Args:
             df (pd.DataFrame): The DataFrame to be transformed
         """
-        pass
+        # Retrieve disatnce and duration from the API when available
+        # df["DURATION"] = df.apply(lambda x: self.get_route_info(x)["duration"], axis=1)
+        # df["DISTANCE"] = df.apply(lambda x: self.get_route_info(x)["distance"], axis=1)
+
+        # Substitute distance with geodesic distance
+        df["DISTANCE"] = geodesic(
+            df["FIRST_COLLECTION_LATITUDE"],
+            df["FIRST_COLLECTION_LONGITUDE"],
+            df["LAST_DELIVERY_LATITUDE"],
+            df["LAST_DELIVERY_LONGITUDE"],
+        ).km
+
+        df["SHIPMENT_DURATION"] = (
+            df["LAST_DELIVERY_SCHEDULE_LATEST"]
+            - df["FIRST_COLLECTION_SCHEDULE_EARLIEST"]
+        ).apply(lambda x: x.total_seconds() / 3600)
+
+        return df
 
     def clean(self, df):
         """Performs cleaning operations on the DataFrame df.
