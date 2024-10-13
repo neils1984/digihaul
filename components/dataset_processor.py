@@ -29,7 +29,8 @@ class DatasetProcessor:
 
     def get_route_info(self, booking):
         """This method *would* return the distance/estimated travel time data
-        from a routing API such as distancematrix.ai or Google Maps if one was available
+        from a routing API such as distancematrix.ai or Google Maps if one was
+        available
 
         Args:
             booking (pd.Series | NamedTuple): A single booking record
