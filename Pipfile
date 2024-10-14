@@ -60,6 +60,7 @@ wcwidth = "==0.2.13"
 pytest = "*"
 flake8 = "*"
 uvicorn = "*"
+tabulate = "*"
 
 [dev-packages]
 
